@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.bank.exception.AccountNotFoundException;
 import com.bank.exception.InvalidAadharNumber;
 import com.bank.exception.InvalidAccountNumber;
 import com.bank.exception.InvalidAmount;
@@ -42,6 +43,11 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(InvalidName.class)
 	public ResponseEntity<?> invalidName(InvalidName e){
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	}
+	
+	@ExceptionHandler(AccountNotFoundException.class)
+	public ResponseEntity<?> accountNotFoundException(AccountNotFoundException e){
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
 

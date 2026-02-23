@@ -10,6 +10,7 @@ import com.bank.dto.AccountDisplayDTO;
 import com.bank.dto.BalanceDTO;
 import com.bank.dto.UpdateAccountDTO;
 import com.bank.exception.AccountDetailsValidation;
+import com.bank.exception.AccountNotFoundException;
 import com.bank.exception.InvalidAmount;
 import com.bank.mapper.AccountBalanceMapper;
 import com.bank.mapper.AccountDisplayMapper;
@@ -88,9 +89,9 @@ public class AccountServiceImpl implements AccountService {
 	//---------------------------------------CLOSE ACCOUNTS-----------------------------------------------------
 	@Transactional
 	@Override
-	public Account closeAccount(Long accno) {
+	public String closeAccount(Long accno) {
 
-		Account temp = this.getByAccountNumber(accno);
+		Account temp =accountRepository.findById(accno).orElseThrow(() -> new AccountNotFoundException("Account Not Found "));
 
 //		if(temp.getBalance() < 0) {
 //			temp.setBalance(0.0);
@@ -98,7 +99,7 @@ public class AccountServiceImpl implements AccountService {
 //		}
 
 		accountRepository.deleteById(accno);
-		return temp;
+		return "Account Close Successfully!!";
 	}
 
 	
@@ -130,46 +131,61 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public BalanceDTO getBalance(Long accno) {
 
-		Account account = this.getByAccountNumber(accno);
+		
+		Account account = accountRepository.findById(accno).orElseThrow(() -> new AccountNotFoundException("Account Not Found with account Number :"
+				+ accno));
 		return AccountBalanceMapper.toBalanceDTO(account);
 
 	}
 
 	//---------------------------------------UPDATE ACCOUNTS-----------------------------------------------------
 	@Override
-	public Account update(Long accno, UpdateAccountDTO updateAccountDTO) {
+	public UpdateAccountDTO update(Long accno, UpdateAccountDTO updateAccountDTO) {
 
-		// Search Account
-		Account existingAccount = this.getByAccountNumber(accno);
+	    // 1️⃣ Fetch existing account
+	    Account existingAccount = this.getByAccountNumber(accno);
 
-		if (updateAccountDTO.getName() != null) {
-			adv.validName(updateAccountDTO.getName());
-			existingAccount.setName(updateAccountDTO.getName());
-		}
+	    // 2️⃣ Update only non-null fields
+	    if (updateAccountDTO.getName() != null) {
+	        adv.validName(updateAccountDTO.getName());
+	        existingAccount.setName(updateAccountDTO.getName());
+	    }
 
-		if (updateAccountDTO.getEmail() != null) {
-			adv.validEmail(updateAccountDTO.getEmail());
-			existingAccount.setEmail(updateAccountDTO.getEmail());
-		}
+	    if (updateAccountDTO.getEmail() != null) {
+	        adv.validEmail(updateAccountDTO.getEmail());
+	        existingAccount.setEmail(updateAccountDTO.getEmail());
+	    }
 
-		if (updateAccountDTO.getMob() != null) {
-			adv.validMobileNumber(updateAccountDTO.getMob());
-			existingAccount.setMob(updateAccountDTO.getMob());
-		}
+	    if (updateAccountDTO.getMob() != null) {
+	        adv.validMobileNumber(updateAccountDTO.getMob());
+	        existingAccount.setMob(updateAccountDTO.getMob());
+	    }
 
-		if (updateAccountDTO.getAddress() != null)
-			existingAccount.setAddress(updateAccountDTO.getAddress());
+	    if (updateAccountDTO.getAddress() != null) {
+	        existingAccount.setAddress(updateAccountDTO.getAddress());
+	    }
 
-		return accountRepository.save(existingAccount);
+	    // 3️⃣ Save updated account
+	    Account savedAccount = accountRepository.save(existingAccount);
+
+	    // 4️⃣ Map saved account to UpdateAccountDTO
+	    UpdateAccountDTO updatedDTO = new UpdateAccountDTO();
+	    updatedDTO.setName(savedAccount.getName());
+	    updatedDTO.setEmail(savedAccount.getEmail());
+	    updatedDTO.setMob(savedAccount.getMob());
+	    updatedDTO.setAddress(savedAccount.getAddress());
+
+	    return updatedDTO;
 	}
-
+	
 	//---------------------------------------WITHDRAW AMOUNT-----------------------------------------------------
 	@Transactional
 	@Override
 	public BalanceDTO withdrawAmount(Long accno, Double amount) {
 
 		// Search Account
-		Account account = this.getByAccountNumber(accno);
+		Account account = accountRepository.findById(accno).orElseThrow(() -> new AccountNotFoundException("Account Not Found with account Number :"
+				+ accno));
 		adv.validAmount(amount);
 
 		if (account instanceof SavingAccount savingAccount) {
@@ -205,7 +221,7 @@ public class AccountServiceImpl implements AccountService {
 	// Manage DB transaction: commit if successful, rollback on error
 
 	@Override
-	public BalanceDTO depositeAmount(Long accno, Double amount) {
+	public BalanceDTO depositAmount(Long accno, Double amount) {
 
 		adv.validAmount(amount);
 

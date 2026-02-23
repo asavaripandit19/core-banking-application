@@ -25,10 +25,10 @@ public interface AccountService {
 		List<AccountDisplayDTO> getCurrentAccounts();
 	
 	//update
-	Account update(Long id, UpdateAccountDTO updateAccountDTO);
+	UpdateAccountDTO update(Long id, UpdateAccountDTO updateAccountDTO);
 	
 	//delete
-	Account closeAccount(Long accno);
+	String closeAccount(Long accno);
 	
 	//Search
 	Account getByAccountNumber(Long accno);
@@ -42,7 +42,7 @@ public interface AccountService {
 	BalanceDTO withdrawAmount(Long accno, Double amount);
 	
 	//deposite amount
-	BalanceDTO depositeAmount(Long accno, Double amount);
+	BalanceDTO depositAmount(Long accno, Double amount);
 	
 	
 	
