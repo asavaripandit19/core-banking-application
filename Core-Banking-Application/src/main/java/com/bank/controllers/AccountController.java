@@ -11,19 +11,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bank.dto.AccountDisplayDTO;
 import com.bank.dto.BalanceDTO;
+import com.bank.dto.TranscationDTO;
 import com.bank.dto.UpdateAccountDTO;
 import com.bank.models.Account;
 import com.bank.models.CurrentAccount;
 import com.bank.models.SavingAccount;
 import com.bank.service.AccountService;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/accounts")
@@ -111,4 +108,10 @@ public class AccountController {
 	public ResponseEntity<Account> getByMobileNumber(@PathVariable String mob) {
 		return ResponseEntity.ok(accountService.getByMobileNumber(mob));
 	}
+	
+	@GetMapping("/show-transcation-history/{accno}")
+	public ResponseEntity<List<TranscationDTO>> getTranscationHistory(@PathVariable Long accno) {
+		return ResponseEntity.ok(accountService.getTransactionsHistory(accno));
+	}
+
 }

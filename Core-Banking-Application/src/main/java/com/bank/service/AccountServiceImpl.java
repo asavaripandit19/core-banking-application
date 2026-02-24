@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bank.dto.AccountDisplayDTO;
 import com.bank.dto.BalanceDTO;
+import com.bank.dto.TranscationDTO;
 import com.bank.dto.UpdateAccountDTO;
 import com.bank.exception.AccountDetailsValidation;
 import com.bank.exception.AccountNotFoundException;
@@ -19,7 +20,6 @@ import com.bank.models.CurrentAccount;
 import com.bank.models.SavingAccount;
 import com.bank.models.Transaction;
 import com.bank.models.TransactionType;
-
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CurrentAccountRepository;
 import com.bank.repository.SavingAccountRepository;
@@ -90,15 +90,26 @@ public class AccountServiceImpl implements AccountService {
 	public List<AccountDisplayDTO> getCurrentAccounts() {
 
 		return currentAccountRepository.findAll().stream().map(AccountDisplayMapper::toSafeDto).toList();
+		
 	}
 
-	
+	@Override
+	public List<TranscationDTO> getTransactionsHistory(Long accno) {
+		
+		Account temp =this.getByAccountNumber(accno);
+		List<Transaction>  transcations = transactionRespository.findByAccNo(accno);
+		if(transcations.isEmpty())
+			throw new AccountNotFoundException("No transcation found for account : "+accno);
+		
+		return transcations.stream().map(TranscationDTO::toSafeTranscationDto).toList();
+		
+	}	
 	//---------------------------------------CLOSE ACCOUNTS-----------------------------------------------------
 	@Transactional
 	@Override
 	public String closeAccount(Long accno) {
 
-		Account temp =accountRepository.findById(accno).orElseThrow(() -> new AccountNotFoundException("Account Not Found "));
+		Account temp =this.getByAccountNumber(accno);
 
 //		if(temp.getBalance() < 0) {
 //			temp.setBalance(0.0);
@@ -114,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Account getByAccountNumber(Long accno) {
 		adv.validAccountNumber(accno);
-		return accountRepository.findById(accno).orElseThrow(() -> new RuntimeException("Account Not Found"));
+		return accountRepository.findById(accno).orElseThrow(() -> new AccountNotFoundException("Account Not Found"));
 
 	}
 
@@ -122,7 +133,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Account getByEmail(String email) {
 		adv.validEmail(email);
-		return accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Email Not Found"));
+		return accountRepository.findByEmail(email).orElseThrow(() -> new AccountNotFoundException("Email Not Found"));
 
 	}
 
@@ -130,7 +141,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Account getByMobileNumber(String mob) {
 		adv.validMobileNumber(mob);
-		return accountRepository.findByMob(mob).orElseThrow(() -> new RuntimeException("Mobile Number Not Found"));
+		return accountRepository.findByMob(mob).orElseThrow(() -> new AccountNotFoundException("Mobile Number Not Found"));
 	}
 
 	
@@ -139,8 +150,7 @@ public class AccountServiceImpl implements AccountService {
 	public BalanceDTO getBalance(Long accno) {
 
 		
-		Account account = accountRepository.findById(accno).orElseThrow(() -> new AccountNotFoundException("Account Not Found with account Number :"
-				+ accno));
+		Account account = this.getByAccountNumber(accno);
 		return AccountBalanceMapper.toBalanceDTO(account);
 
 	}
@@ -191,8 +201,7 @@ public class AccountServiceImpl implements AccountService {
 	public BalanceDTO withdrawAmount(Long accno, Double amount) {
 
 		// Search Account
-		Account account = accountRepository.findById(accno).orElseThrow(() -> new AccountNotFoundException("Account Not Found with account Number :"
-				+ accno));
+		Account account = this.getByAccountNumber(accno);
 		adv.validAmount(amount);
 
 		if (account instanceof SavingAccount savingAccount) {
@@ -247,5 +256,8 @@ public class AccountServiceImpl implements AccountService {
 		
 		transactionRespository.save(new Transaction(accNo, amount, transactionType));
 	}
+
+
+
 
 }

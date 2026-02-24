@@ -28,7 +28,7 @@ public class AccountDetailsValidation extends RuntimeException {
 	public void validMobileNumber(String mob) {
 
 		if (mob.trim().length() > 10 || mob.trim().length() < 10) {
-			throw new InvalidMobileNumber("Mobile is required");
+			throw new InvalidMobileNumber("Invalid Mobile");
 		}
 		
 

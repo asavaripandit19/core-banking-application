@@ -2,13 +2,11 @@ package com.bank.service;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
-
 import com.bank.dto.AccountDisplayDTO;
 import com.bank.dto.BalanceDTO;
+import com.bank.dto.TranscationDTO;
 import com.bank.dto.UpdateAccountDTO;
 import com.bank.models.Account;
-import com.bank.models.SavingAccount;
 import com.bank.models.TransactionType;
 
 
@@ -48,6 +46,6 @@ public interface AccountService {
 	
 	void setTransaction(Long accNo, Double amount, TransactionType transactionType);
 	
-	
+	List<TranscationDTO> getTransactionsHistory(Long accno);
 	
 }

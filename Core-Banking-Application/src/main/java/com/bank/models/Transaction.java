@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -17,11 +19,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name ="Account_Transaction")
+@Table(name ="Pay_Spring_Transaction_Table")
 
 public class Transaction {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long transcationId;
 	private Long accNo;
 	private LocalDate transactionDate;
 	private LocalTime transactionTime;
