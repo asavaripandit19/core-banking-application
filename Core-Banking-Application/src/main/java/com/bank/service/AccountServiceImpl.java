@@ -17,9 +17,13 @@ import com.bank.mapper.AccountDisplayMapper;
 import com.bank.models.Account;
 import com.bank.models.CurrentAccount;
 import com.bank.models.SavingAccount;
+import com.bank.models.Transaction;
+import com.bank.models.TransactionType;
+
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CurrentAccountRepository;
 import com.bank.repository.SavingAccountRepository;
+import com.bank.repository.TransactionRespository;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -35,6 +39,9 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private CurrentAccountRepository currentAccountRepository;
+	
+	@Autowired
+	private TransactionRespository transactionRespository;
 
 	//---------------------------------------CREATE ACCOUNT-----------------------------------------------------
 	@Override
@@ -210,7 +217,7 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		account.setBalance(account.getBalance() - amount);
-
+		setTransaction(accno, amount, TransactionType.DEBIT);
 		return AccountBalanceMapper.toBalanceDTO(account);
 
 	}
@@ -230,7 +237,15 @@ public class AccountServiceImpl implements AccountService {
 
 		// Add balance in Account
 		account.setBalance(account.getBalance() + amount);
+		setTransaction(accno, amount, TransactionType.CREDIT);
 		return AccountBalanceMapper.toBalanceDTO(account);
+	}
+
+
+	@Override
+	public void setTransaction(Long accNo, Double amount, TransactionType transactionType) {
+		
+		transactionRespository.save(new Transaction(accNo, amount, transactionType));
 	}
 
 }

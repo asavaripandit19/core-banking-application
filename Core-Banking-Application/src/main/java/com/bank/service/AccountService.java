@@ -9,6 +9,8 @@ import com.bank.dto.BalanceDTO;
 import com.bank.dto.UpdateAccountDTO;
 import com.bank.models.Account;
 import com.bank.models.SavingAccount;
+import com.bank.models.TransactionType;
+
 
 public interface AccountService {
 
@@ -43,6 +45,8 @@ public interface AccountService {
 	
 	//deposite amount
 	BalanceDTO depositAmount(Long accno, Double amount);
+	
+	void setTransaction(Long accNo, Double amount, TransactionType transactionType);
 	
 	
 	
