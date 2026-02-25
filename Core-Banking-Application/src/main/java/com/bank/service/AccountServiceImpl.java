@@ -600,7 +600,6 @@ public class AccountServiceImpl implements AccountService {
 
 	            "</td>" +
 	            "</tr>" +
-
 	            // Footer
 	            "<tr>" +
 	            "<td style='background:#f4f6f9;text-align:center;padding:15px;font-size:12px;color:#777;'>" +
