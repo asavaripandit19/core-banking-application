@@ -20,14 +20,19 @@ import com.bank.dto.UpdateAccountDTO;
 import com.bank.models.Account;
 import com.bank.models.CurrentAccount;
 import com.bank.models.SavingAccount;
+import com.bank.models.User;
 import com.bank.service.AccountService;
+import com.bank.service.EmployeeService;
 
 @RestController
-@RequestMapping("/accounts")
-public class AccountController {
+@RequestMapping("/employee")
+public class EmployeeController {
 
 	@Autowired
 	private AccountService accountService;
+
+	@Autowired
+	private EmployeeService userService;
 
 	// ------------------ Create Saving Accounts ------------------
 	@PostMapping("create-saving-account")
@@ -39,7 +44,7 @@ public class AccountController {
 	@PostMapping("create-current-account")
 	public void createCurrentAccount(@RequestBody CurrentAccount currentAccount) {
 		accountService.createAccount(currentAccount);
-		;
+
 	}
 
 	// ------------------ Display Only Current Accounts ------------------
@@ -89,29 +94,42 @@ public class AccountController {
 
 	// ------------------ Update Account --------------------------
 	@PutMapping("/update-account/{accno}")
-	public ResponseEntity<UpdateAccountDTO> updateAccount(@PathVariable Long accno, @RequestBody UpdateAccountDTO updateAccountDTO) {
+	public ResponseEntity<UpdateAccountDTO> updateAccount(@PathVariable Long accno,
+			@RequestBody UpdateAccountDTO updateAccountDTO) {
 		UpdateAccountDTO updatedDTO = accountService.update(accno, updateAccountDTO);
 		return ResponseEntity.ok(updatedDTO);
 	}
-	
+
 	@GetMapping("/search-by-account-number/{accno}")
 	public ResponseEntity<Account> getAccount(@PathVariable Long accno) {
 		return ResponseEntity.ok(accountService.getByAccountNumber(accno));
 	}
-	
+
 	@GetMapping("/search-by-email/{email}")
 	public ResponseEntity<Account> getByEmail(@PathVariable String email) {
 		return ResponseEntity.ok(accountService.getByEmail(email));
 	}
-	
+
 	@GetMapping("/search-by-mobile-number/{mob}")
 	public ResponseEntity<Account> getByMobileNumber(@PathVariable String mob) {
 		return ResponseEntity.ok(accountService.getByMobileNumber(mob));
 	}
-	
+
 	@GetMapping("/show-transcation-history/{accno}")
 	public ResponseEntity<List<TranscationDTO>> getTranscationHistory(@PathVariable Long accno) {
 		return ResponseEntity.ok(accountService.getTransactionsHistory(accno));
+	}
+
+	@PostMapping("/register")
+	public void register(@RequestBody User user) {
+
+		userService.registerUser(user);
+	}
+
+	@GetMapping("/login/{email}/{password}")
+	public String login(@PathVariable String email, @PathVariable String password) {
+
+		return userService.login(email, password);
 	}
 
 }

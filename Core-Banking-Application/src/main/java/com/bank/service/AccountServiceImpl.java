@@ -17,11 +17,14 @@ import com.bank.exception.InvalidAmount;
 import com.bank.mapper.AccountBalanceMapper;
 import com.bank.mapper.AccountDisplayMapper;
 import com.bank.models.Account;
+import com.bank.models.AccountType;
+import com.bank.models.AccountTypeConfig;
 import com.bank.models.CurrentAccount;
 import com.bank.models.SavingAccount;
 import com.bank.models.Transaction;
 import com.bank.models.TransactionType;
 import com.bank.repository.AccountRepository;
+import com.bank.repository.AccountTypeConfigRepository;
 import com.bank.repository.CurrentAccountRepository;
 import com.bank.repository.SavingAccountRepository;
 import com.bank.repository.TransactionRespository;
@@ -30,7 +33,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 @Service
 public class AccountServiceImpl implements AccountService {
 
-	//aefed
+	// aefed
 	@Autowired
 	private EmailService emailService;
 
@@ -48,9 +51,11 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private TransactionRespository transactionRespository;
+	
+	@Autowired
+	private AccountTypeConfigRepository accTypeConfigRepository;
 
-	// ---------------------------------------CREATE
-	// ACCOUNT-----------------------------------------------------
+	// -----------------CREATE ACCOUNT----------------------------------
 	@Override
 	public void createAccount(Account account) {
 		adv.validName(account.getName());
@@ -58,21 +63,33 @@ public class AccountServiceImpl implements AccountService {
 		adv.validMobileNumber(account.getMob());
 		adv.validAadharNumber(account.getAadharNo());
 
-		if (account instanceof SavingAccount) {
-
-			SavingAccount savingAccount = (SavingAccount) account;
-
-			if (account.getBalance() < savingAccount.getMIN_BALANCE())
-				throw new InvalidAmount("You Should have to add at least " + savingAccount.getMIN_BALANCE() + "!");
-
-		} else if (account instanceof CurrentAccount) {
-
-			CurrentAccount currentAccount = (CurrentAccount) account;
-
-			if (account.getBalance() < currentAccount.getMIN_BALANCE())
-				throw new InvalidAmount("You Should have to add at least " + currentAccount.getMIN_BALANCE() + "!");
-
-		}
+//		if (account instanceof SavingAccount) {
+//
+//			SavingAccount savingAccount = (SavingAccount) account;
+//
+//			if (account.getBalance() < savingAccount.getMIN_BALANCE())
+//				throw new InvalidAmount("You Should have to add at least " + savingAccount.getMIN_BALANCE() + "!");
+//
+//		} else if (account instanceof CurrentAccount) {
+//
+//			CurrentAccount currentAccount = (CurrentAccount) account;
+//
+//			if (account.getBalance() < currentAccount.getMIN_BALANCE())
+//				throw new InvalidAmount("You Should have to add at least " + currentAccount.getMIN_BALANCE() + "!");
+//
+//		}
+		
+		AccountType accType;
+		if(account instanceof SavingAccount)
+			accType = AccountType.SAVING;
+		else
+			accType = AccountType.CURRENT;
+		
+		AccountTypeConfig config = accTypeConfigRepository.findById(accType).orElseThrow(() -> new RuntimeException("Account Type Not Found!"));
+		
+		   if (account.getBalance() < config.getMIN_BALANCE()) {
+		        throw new InvalidAmount("You Should have to add at least " + config.getMIN_BALANCE() + "!");
+		    }
 
 		String subject = "Welcome to PaySpring Bank! 🎉";
 
@@ -109,8 +126,7 @@ public class AccountServiceImpl implements AccountService {
 		accountRepository.save(account);
 	}
 
-	// ---------------------------------------DISPLAY
-	// ACCOUNTS-----------------------------------------------------
+	// ------------------DISPLAY ACCOUNTS----------------------------------------
 	@Override
 	public List<AccountDisplayDTO> getAllAccounts() {
 
@@ -388,27 +404,41 @@ public class AccountServiceImpl implements AccountService {
 		Account account = this.getByAccountNumber(accno);
 		adv.validAmount(amount);
 
-		if (account instanceof SavingAccount savingAccount) {
-
-			// Min Balance Checking
-			if (account.getBalance() - amount < savingAccount.getMIN_BALANCE()) {
-				throw new InvalidAmount("You should have to maintain minimum balance!! You can only withdrow"
-						+ (account.getBalance() - savingAccount.getMIN_BALANCE()));
-			}
-
-			// Withdraw Limit Checking
-			if (amount > savingAccount.getWithdrawLimit()) {
-				throw new InvalidAmount(
-						"You cannot withdraw more than" + savingAccount.getWithdrawLimit() + "at a time");
-			}
-
-		} else if (account instanceof CurrentAccount currentAccount) {
-
-			if (account.getBalance() - amount < currentAccount.getMIN_BALANCE())
-				throw new InvalidAmount("You should have to maintain minimum balance!! You can only withdrow"
-						+ (account.getBalance() - currentAccount.getMIN_BALANCE()));
+//		if (account instanceof SavingAccount savingAccount) {
+//
+//			// Min Balance Checking
+//			if (account.getBalance() - amount < savingAccount.getMIN_BALANCE()) {
+//				throw new InvalidAmount("You should have to maintain minimum balance!! You can only withdrow"
+//						+ (account.getBalance() - savingAccount.getMIN_BALANCE()));
+//			}
+//
+//			// Withdraw Limit Checking
+//			if (amount > savingAccount.getWithdrawLimit()) {
+//				throw new InvalidAmount(
+//						"You cannot withdraw more than" + savingAccount.getWithdrawLimit() + "at a time");
+//			}
+//
+//		} else if (account instanceof CurrentAccount currentAccount) {
+//
+//			if (account.getBalance() - amount < currentAccount.getMIN_BALANCE())
+//				throw new InvalidAmount("You should have to maintain minimum balance!! You can only withdrow"
+//						+ (account.getBalance() - currentAccount.getMIN_BALANCE()));
+//		}
+		
+		AccountType accType;
+		if(account instanceof SavingAccount)
+			accType = AccountType.SAVING;
+		else
+			accType = AccountType.CURRENT;
+		
+		AccountTypeConfig config = accTypeConfigRepository.findById(accType).orElseThrow(() -> new RuntimeException("Account Type Not Found!"));
+		
+		if(amount>config.getWITHDRAW_LIMIT()) {
+			throw new InvalidAmount("You cannot withdraw more than" + config.getWITHDRAW_LIMIT() + "at a time");
 		}
-
+		
+		
+		
 		account.setBalance(account.getBalance() - amount);
 		setTransaction(accno, amount, TransactionType.DEBIT);
 		String subject = "Withdraw Successful";
@@ -476,10 +506,8 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public BalanceDTO depositAmount(Long accno, Double amount) {
 
-		// 1️⃣ Validate amount
 		adv.validAmount(amount);
 
-		// 2️⃣ Get account
 		Account account = this.getByAccountNumber(accno);
 
 		account.setBalance(account.getBalance() + amount);
@@ -537,7 +565,7 @@ public class AccountServiceImpl implements AccountService {
 
 				"</table>" + "</body>" + "</html>";
 		emailService.sendMail(account.getEmail(), subject, message);
-		//aefea
+
 		return AccountBalanceMapper.toBalanceDTO(account);
 	}
 
