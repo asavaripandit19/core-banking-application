@@ -433,7 +433,7 @@ public class AccountServiceImpl implements AccountService {
 		
 		AccountTypeConfig config = accTypeConfigRepository.findById(accType).orElseThrow(() -> new RuntimeException("Account Type Not Found!"));
 		
-		if(amount>config.getWITHDRAW_LIMIT()) {
+		if(config.getWITHDRAW_LIMIT() != null && amount>config.getWITHDRAW_LIMIT()) {
 			throw new InvalidAmount("You cannot withdraw more than" + config.getWITHDRAW_LIMIT() + "at a time");
 		}
 		
