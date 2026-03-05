@@ -3,12 +3,14 @@ package com.bank.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.bank.exception.AccountDetailsValidation;
 import com.bank.models.User;
 import com.bank.repository.UserRepository;
 
-public class EmployeeServiceImpl implements EmployeeService {
+@Service
+public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
@@ -19,7 +21,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public void registerUser(User user) {
 
-		adv.validName(user.getUsername());
+		
 		adv.validEmail(user.getEmail());
 
 		String regex = "^(?=.*[A-Z])(?=.*[@#$%^&+=!]).{6,}$";

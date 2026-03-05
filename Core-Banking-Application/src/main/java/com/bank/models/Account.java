@@ -26,13 +26,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Pay_Spring_Bank")
+@Table(name = "Pay_Spring_Bank_demo")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "Acctype", discriminatorType = DiscriminatorType.STRING)
 public class Account {
 
 	@Id
-	private Long accNo = 0l;
+	private Long accNo;
 
 	@NotBlank
 	private String name;
@@ -46,7 +46,7 @@ public class Account {
 	private String mob;
 
 	@NotNull(message = "Aadhar Numbers is requried")
-	@Pattern(regexp = "^[0-9]{12}$", message = "Aadhar number must be exactly 12 digits")
+//	@Pattern(regexp = "^[0-9]{12}$", message = "Aadhar number must be exactly 12 digits")
 	@Column(unique = true)
 	private String aadharNo;
 
@@ -59,9 +59,9 @@ public class Account {
 	@JsonIgnore
 	private LocalDate date = LocalDate.now();
 
-	@PrePersist // Run the method below before the entity is saved
-	public void onCreate() {
-		this.date = LocalDate.now();
-	}
+//	@PrePersist // Run the method below before the entity is saved
+//	public void onCreate() {
+//		this.date = LocalDate.now();
+//	}
 
 }

@@ -30,6 +30,9 @@ public class AdminServiceImpl implements AdminService{
 
 	@Override
 	public void delete(Long userId) {
+		  if(userId == null){
+		        throw new RuntimeException("User ID cannot be null");
+		    }
 		userRepository.deleteById(userId);
 		
 	}
@@ -39,7 +42,7 @@ public class AdminServiceImpl implements AdminService{
 	public void updateMinBalance(Double amount, AccountType type) {
 		AccountTypeConfig config = accConfigRepository.findById(type).orElseThrow(() -> new RuntimeException("Account type not found!"));
 		config.setMIN_BALANCE(amount);
-		
+		accConfigRepository.save(config);
 	}
 
 
@@ -51,7 +54,7 @@ public class AdminServiceImpl implements AdminService{
 			throw new RuntimeException("You cannot set withdraw limit to Current account!!");
 		
 		config.setWITHDRAW_LIMIT(amount);
-		
+		accConfigRepository.save(config);
 		
 	}
 }

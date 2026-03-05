@@ -1,0 +1,32 @@
+package com.bank.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bank.models.User;
+import com.bank.service.UserService;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+	@Autowired
+	private UserService userService;
+	
+	@PostMapping("/register")
+	public void register(@RequestBody User user) {
+
+		userService.registerUser(user);
+	}
+
+	@GetMapping("/login/{email}/{password}")
+	public String login(@PathVariable String email, @PathVariable String password) {
+
+		return userService.login(email, password);
+	}
+}

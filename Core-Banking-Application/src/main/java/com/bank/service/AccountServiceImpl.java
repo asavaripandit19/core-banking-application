@@ -87,10 +87,13 @@ public class AccountServiceImpl implements AccountService {
 		
 		AccountTypeConfig config = accTypeConfigRepository.findById(accType).orElseThrow(() -> new RuntimeException("Account Type Not Found!"));
 		
-		   if (account.getBalance() < config.getMIN_BALANCE()) {
+		   if (account.getBalance() <	 config.getMIN_BALANCE()) {
 		        throw new InvalidAmount("You Should have to add at least " + config.getMIN_BALANCE() + "!");
 		    }
 
+		   System.out.println(account);
+		   accountRepository.save(account);
+		   System.out.println("hi");
 		String subject = "Welcome to PaySpring Bank! 🎉";
 
 		String message = "<!DOCTYPE html>" + "<html>"
@@ -123,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
 				"</table>" + "</body>" + "</html>";
 
 		emailService.sendMail(account.getEmail(), subject, message);
-		accountRepository.save(account);
+		
 	}
 
 	// ------------------DISPLAY ACCOUNTS----------------------------------------

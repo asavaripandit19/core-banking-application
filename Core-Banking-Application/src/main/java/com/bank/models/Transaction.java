@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name ="Pay_Spring_Transaction_Table")
+@Table(name ="Transaction_Table")
 
 public class Transaction {
 

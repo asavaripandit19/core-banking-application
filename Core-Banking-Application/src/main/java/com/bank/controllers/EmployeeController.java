@@ -22,17 +22,17 @@ import com.bank.models.CurrentAccount;
 import com.bank.models.SavingAccount;
 import com.bank.models.User;
 import com.bank.service.AccountService;
-import com.bank.service.EmployeeService;
+import com.bank.service.UserService;
 
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("/accounts")
 public class EmployeeController {
 
 	@Autowired
 	private AccountService accountService;
 
 	@Autowired
-	private EmployeeService userService;
+	private UserService userService;
 
 	// ------------------ Create Saving Accounts ------------------
 	@PostMapping("create-saving-account")
@@ -120,16 +120,6 @@ public class EmployeeController {
 		return ResponseEntity.ok(accountService.getTransactionsHistory(accno));
 	}
 
-	@PostMapping("/register")
-	public void register(@RequestBody User user) {
 
-		userService.registerUser(user);
-	}
-
-	@GetMapping("/login/{email}/{password}")
-	public String login(@PathVariable String email, @PathVariable String password) {
-
-		return userService.login(email, password);
-	}
 
 }

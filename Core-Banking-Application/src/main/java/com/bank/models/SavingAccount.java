@@ -7,9 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import lombok.Data;
 
-
+@Entity
 @DiscriminatorValue("SAVING")
-
 public class SavingAccount extends Account {
 
     

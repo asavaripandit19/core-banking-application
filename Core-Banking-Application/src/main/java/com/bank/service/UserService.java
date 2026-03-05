@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.bank.models.User;
 
-public interface EmployeeService {
+public interface UserService {
 //
 	void registerUser(User user);
 	String login(String email, String password);
