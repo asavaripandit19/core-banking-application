@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.bank.exception.AccountDetailsValidation;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import com.bank.models.Role;
 import com.bank.models.User;
 import com.bank.repository.UserRepository;
 
@@ -43,6 +45,7 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 		if (existingUser.isPresent())
 			throw new RuntimeException("Email alredy exits!");
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		user.setRole(Role.EMPLOYEE);
 		userRepository.save(user);
 	}
 
