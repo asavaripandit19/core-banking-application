@@ -1,6 +1,7 @@
 package com.bank.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bank.exception.AccountDetailsValidation;
-import com.bank.exception.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.bank.models.User;
 import com.bank.repository.UserRepository;
 
@@ -38,31 +39,34 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 					"Password must be minimum 6 characters, contain at least one capital letter and one special symbol.");
 		}
 
-		User existingUser = userRepository.findByEmail(user.getEmail());
-		if (existingUser != null)
+		Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+		if (existingUser.isPresent())
 			throw new RuntimeException("Email alredy exits!");
-
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		userRepository.save(user);
 	}
 
 	@Override
 	public String login(String email, String password) {
-		User temp = userRepository.findByEmail(email);
+		Optional<User> temp = userRepository.findByEmail(email);
 		if (temp == null) {
 			return "User Not Found!";
 		}
-		if (password.equals(temp.getPassword())) {
-			return "User login Successful!!";
-		}
+		User user = temp.get();   
+
+	    if (passwordEncoder.matches(password, user.getPassword())) {
+	        return "User login Successful!!";
+	    }
 		return "Invalid Password!!";
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		//fetch user present in the db
-		User user = userRepository.findEmail(email).get();
+		User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
 				
-		System.out.println("email is "+user.getEmail());
+		
 		
 		//inject db user in spring security User object
 		return org.springframework.security.core.userdetails.User.
@@ -73,5 +77,6 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 				.build();
 	}
 	
-
+	
+	
 }

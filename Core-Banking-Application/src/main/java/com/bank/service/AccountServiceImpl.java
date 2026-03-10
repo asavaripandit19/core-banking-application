@@ -1,5 +1,7 @@
 package com.bank.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ import com.bank.mapper.AccountDisplayMapper;
 import com.bank.models.Account;
 import com.bank.models.AccountType;
 import com.bank.models.AccountTypeConfig;
-import com.bank.models.CurrentAccount;
 import com.bank.models.SavingAccount;
 import com.bank.models.Transaction;
 import com.bank.models.TransactionType;
@@ -28,7 +29,6 @@ import com.bank.repository.AccountTypeConfigRepository;
 import com.bank.repository.CurrentAccountRepository;
 import com.bank.repository.SavingAccountRepository;
 import com.bank.repository.TransactionRespository;
-import com.sendgrid.helpers.mail.objects.Email;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -55,9 +55,15 @@ public class AccountServiceImpl implements AccountService {
 	@Autowired
 	private AccountTypeConfigRepository accTypeConfigRepository;
 
+	
+	
+	
+	 
 	// -----------------CREATE ACCOUNT----------------------------------
 	@Override
 	public void createAccount(Account account) {
+	
+	    
 		adv.validName(account.getName());
 		adv.validEmail(account.getEmail());
 		adv.validMobileNumber(account.getMob());
@@ -571,6 +577,8 @@ public class AccountServiceImpl implements AccountService {
 
 		return AccountBalanceMapper.toBalanceDTO(account);
 	}
+	
+	
 
 	@Override
 	public void setTransaction(Long accNo, Double amount, TransactionType transactionType) {

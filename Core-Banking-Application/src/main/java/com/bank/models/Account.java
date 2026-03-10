@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Pay_Spring_Bank_demo")
+@Table(name = "payspring_bank")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "Acctype", discriminatorType = DiscriminatorType.STRING)
 public class Account {

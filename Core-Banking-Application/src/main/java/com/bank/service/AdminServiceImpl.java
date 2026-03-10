@@ -48,11 +48,11 @@ public class AdminServiceImpl implements AdminService{
 
 	@Override
 	public void updateWithdrawBalance(Double amount, AccountType type) {
-		AccountTypeConfig config = accConfigRepository.findById(type).orElseThrow(() -> new RuntimeException("Account type not found!"));
 		
 		if(type==AccountType.CURRENT)
 			throw new RuntimeException("You cannot set withdraw limit to Current account!!");
 		
+		AccountTypeConfig config = accConfigRepository.findById(type).orElseThrow(() -> new RuntimeException("Account type not found!"));
 		config.setWITHDRAW_LIMIT(amount);
 		accConfigRepository.save(config);
 		
