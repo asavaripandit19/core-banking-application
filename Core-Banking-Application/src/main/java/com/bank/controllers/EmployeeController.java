@@ -27,7 +27,7 @@ import com.bank.service.UserService;
 
 @RestController
 @RequestMapping("/accounts")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class EmployeeController {
 
 	@Autowired
